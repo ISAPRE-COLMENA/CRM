@@ -125,6 +125,7 @@ export default function CalendarView() {
           <FullCalendarWrapper
             view={view}
             onEventDrop={handleEventDrop}
+            onDateClick={handleDateClick}
             events={eventos.map(e => ({
               id: e.id,
               title: e.titulo,
@@ -137,6 +138,13 @@ export default function CalendarView() {
           />
         </div>
       </div>
+
+      {showAdd && (
+        <AddEventModal 
+          onClose={() => setShowAdd(false)}
+          selectedDate={selectedDate}
+        />
+      )}
 
       <style jsx global>{`
         .fc { --fc-border-color: #f3f4f6; --fc-today-bg-color: #eff6ff; font-family: inherit; }

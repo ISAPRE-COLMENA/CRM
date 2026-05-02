@@ -17,7 +17,7 @@ export default function LeadModal({lead:init,onClose,agente}:{lead:Lead;onClose:
     await updateStage(lead.id,stage);setLead(l=>({...l,stage}));
   };
   const toggleDoc=async(key:typeof DOCS[number]['key'])=>{const v=!lead[key];setLead(l=>({...l,[key]:v}));await updateLead(lead.id,{[key]:v});};
-  const handleSaveFirma=async()=>{setSaving(true);const{data}=await updateLead(lead.id,{fecha_firma:firma||null});if(data)setLead(data as Lead);setSaving(false);setEditing(false);};
+  const handleSaveFirma=async()=>{setSaving(true);const{data}=await updateLead(lead.id,{fecha_firma:firma||undefined});if(data)setLead(data as Lead);setSaving(false);setEditing(false);};
   const done=DOCS.filter(d=>lead[d.key]).length;
   return (
     <><div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose}/>

@@ -6,7 +6,7 @@ import { FileSpreadsheet, CheckCircle2, AlertCircle, XCircle, Loader2, ChevronDo
 const FIELD_MAP:Record<string,string[]>={rut:['rut','run'],nombre:['nombre','name','first_name'],apellido:['apellido','last_name'],email:['email','correo'],telefono:['telefono','fono','celular'],sueldo_imponible:['sueldo','imponible','salario'],isapre_actual:['isapre','prevision']};
 function detectField(h:string){const hn=h.toLowerCase().replace(/[\s-]/g,'_');for(const[f,a]of Object.entries(FIELD_MAP)){if(a.some(x=>hn.includes(x)))return f;}return null;}
 function parseCSV(text:string){const lines=text.trim().split(/\r?\n/);if(lines.length<2)return{headers:[] as string[],rows:[] as Record<string,string>[]};const sep=lines[0].includes(';')?';':',';const headers=lines[0].split(sep).map(h=>h.trim().replace(/^"|"$/g,''));const rows=lines.slice(1).map(l=>{const v=l.split(sep).map(x=>x.trim().replace(/^"|"$/g,''));return headers.reduce((o,h,i)=>({...o,[h]:v[i]||''}),{} as Record<string,string>);});return{headers,rows};}
-export default function CSVImporter({onComplete}:{onComplete?:(s:Record<string,number>)=>void}) {
+export default function CSVImporter({onComplete}:{onComplete?:(s:{inserted:number;duplicates:number;errors:number;errorRows:string[]})=>void}) {
   const [step,setStep]=useState<'upload'|'mapping'|'importing'|'done'>('upload');
   const [file,setFile]=useState<File|null>(null);
   const [parsed,setParsed]=useState<{headers:string[];rows:Record<string,string>[]}|null>(null);
