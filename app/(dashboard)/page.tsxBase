@@ -1,0 +1,38 @@
+'use client';
+import { useState } from 'react';
+import Navbar from '@/components/shared/Navbar';
+import type { Lead, Stage } from '@/types';
+import { Users, TrendingUp, DollarSign, Award } from 'lucide-react';
+import { useLeads } from '@/hooks/useLeads';
+import { formatSueldo } from '@/lib/utils';
+
+function KPI({icon:Icon,label,value,sub,color}:{icon:any;label:string;value:string|number;sub?:string;color:string}) {
+  return <div className="bg-white p-5 flex items-center gap-4 rounded-xl shadow-sm border border-gray-100"><div className={`p-3 rounded-xl ${color}`}><Icon size={20} className="text-white"/></div><div><p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p><p className="text-xl font-bold tabular-nums">{value}</p>{sub&&<p className="text-xs text-gray-400 mt-0.5">{sub}</p>}</div></div>;
+}
+
+export default function DashboardPage() {
+  const {leads}=useLeads();
+  const cierres=leads.filter(l=>l.stage==='cierre').length;
+  const pipeline=leads.filter(l=>l.stage!=='nuevo'&&l.stage!=='no_interesado').length;
+  const sueldoCierres=leads.filter(l=>l.stage==='cierre').reduce((a,l)=>a+(l.sueldo_imponible||0),0);
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <Navbar/>
+      <main className="max-w-[1400px] mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div><h1 className="text-xl font-bold">Pipeline de Ventas (RESTORED KPIs)</h1><p className="text-sm text-gray-500 mt-0.5">Gestión de prospectos Isapre Colmena</p></div>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <KPI icon={Users} label="Total" value={leads.length} color="bg-blue-500"/>
+          <KPI icon={TrendingUp} label="En Pipeline" value={pipeline} sub="contactado→evaluación" color="bg-yellow-500"/>
+          <KPI icon={Award} label="Cierres" value={cierres} sub="contratos firmados" color="bg-green-500"/>
+          <KPI icon={DollarSign} label="Sueldo cierres" value={formatSueldo(sueldoCierres)} color="bg-purple-500"/>
+        </div>
+        <div className="p-12 bg-white rounded-2xl border-2 border-dashed border-gray-200 text-center">
+            <p className="text-gray-400">El KanbanBoard se agregará en el siguiente paso.</p>
+        </div>
+      </main>
+    </div>
+  );
+}
