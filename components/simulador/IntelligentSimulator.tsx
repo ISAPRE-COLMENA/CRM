@@ -145,7 +145,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                           <span className="text-[10px] font-black uppercase tracking-wider">Sugerencia del Agente</span>
                         </div>
                         <h2 className="text-4xl font-black text-gray-900 dark:text-white leading-tight">{bestPlan.nombre}</h2>
-                        <p className="text-gray-500 text-sm leading-relaxed">{bestPlan.cobertura}</p>
+                        <p className="text-gray-500 text-sm leading-relaxed">{bestPlan.coberturaHosp}</p>
                       </div>
                       <div className="md:w-64 space-y-4 text-center">
                         <div className="bg-blue-600 text-white p-6 rounded-3xl shadow-lg">
