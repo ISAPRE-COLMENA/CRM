@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Calendar, Upload, LogOut, ShieldCheck, Menu, X, ClipboardCheck, Mail } from 'lucide-react';
+import { LayoutDashboard, Calendar, Upload, LogOut, ShieldCheck, Menu, X, ClipboardCheck, Mail, Award } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV=[
