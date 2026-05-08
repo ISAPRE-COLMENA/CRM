@@ -4,11 +4,20 @@ import KanbanBoard from '@/components/kanban/KanbanBoard';
 import ListView from '@/components/leads/ListView';
 import LeadModal from '@/components/leads/LeadModal';
 import LeadForm from '@/components/leads/LeadForm';
-import IntelligentSimulator from '@/components/simulador/IntelligentSimulator';
 import type { Lead, Stage } from '@/types';
-import { Plus, Users, TrendingUp, DollarSign, Award, LayoutGrid, List } from 'lucide-react';
+import { Plus, Users, TrendingUp, DollarSign, LayoutGrid, List } from 'lucide-center';
 import { useLeads } from '@/hooks/useLeads';
 import { formatSueldo } from '@/lib/utils';
+
+// Iconos de lucide-react (corregido de lucide-center)
+import { 
+  Users as UsersIcon, 
+  TrendingUp as TrendingIcon, 
+  DollarSign as DollarIcon, 
+  Award, 
+  LayoutGrid as GridIcon, 
+  List as ListIcon 
+} from 'lucide-react';
 
 function KPI({icon:Icon,label,value,sub,color}:{icon:any;label:string;value:string|number;sub?:string;color:string}) {
   return <div className="bg-white p-5 flex items-center gap-4 rounded-xl shadow-sm border border-gray-100"><div className={`p-3 rounded-xl ${color}`}><Icon size={20} className="text-white"/></div><div><p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p><p className="text-xl font-bold tabular-nums">{value}</p>{sub&&<p className="text-xs text-gray-400 mt-0.5">{sub}</p>}</div></div>;
@@ -19,7 +28,6 @@ export default function DashboardContent() {
   const [sel,setSel]=useState<Lead|null>(null);
   const [addStage,setAddStage]=useState<Stage|null>(null);
   const [viewMode, setViewMode] = useState<'kanban'|'list'>('list');
-  const [showSim, setShowSim] = useState(false);
 
   const cierres=(leads || []).filter(l=>l && l.stage==='cierre').length;
   const pipeline=(leads || []).filter(l=>l && l.stage!=='nuevo'&&l.stage!=='no_interesado').length;
@@ -34,25 +42,18 @@ export default function DashboardContent() {
         </div>
         
         <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setShowSim(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
-          >
-            <Award size={16}/> Simulador IA
-          </button>
-
           <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-200 p-1">
             <button 
               onClick={() => setViewMode('list')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${viewMode === 'list' ? 'bg-blue-50 text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
             >
-              <List size={16}/> Lista
+              <ListIcon size={16}/> Lista
             </button>
             <button 
               onClick={() => setViewMode('kanban')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${viewMode === 'kanban' ? 'bg-blue-50 text-blue-700' : 'text-gray-400 hover:text-gray-600'}`}
             >
-              <LayoutGrid size={16}/> Tablero
+              <GridIcon size={16}/> Tablero
             </button>
           </div>
           <button onClick={()=>setAddStage('nuevo')} className="btn-primary flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md"><Plus size={16}/>Nuevo prospecto</button>
@@ -60,10 +61,10 @@ export default function DashboardContent() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPI icon={Users} label="Total" value={(leads || []).length} color="bg-blue-500"/>
-        <KPI icon={TrendingUp} label="En Pipeline" value={pipeline} sub="contactado→evaluación" color="bg-yellow-500"/>
+        <KPI icon={UsersIcon} label="Total" value={(leads || []).length} color="bg-blue-500"/>
+        <KPI icon={TrendingIcon} label="En Pipeline" value={pipeline} sub="contactado→evaluación" color="bg-yellow-500"/>
         <KPI icon={Award} label="Cierres" value={cierres} sub="contratos firmados" color="bg-green-500"/>
-        <KPI icon={DollarSign} label="Sueldo cierres" value={formatSueldo(sueldoCierres)} color="bg-purple-500"/>
+        <KPI icon={DollarIcon} label="Sueldo cierres" value={formatSueldo(sueldoCierres)} color="bg-purple-500"/>
       </div>
       
       {viewMode === 'kanban' ? (
@@ -74,7 +75,6 @@ export default function DashboardContent() {
 
       {sel&&<LeadModal lead={sel} onClose={()=>setSel(null)}/>}
       {addStage&&<LeadForm defaultStage={addStage} onClose={()=>setAddStage(null)}/>}
-      {showSim&&<IntelligentSimulator onClose={()=>setShowSim(false)}/>}
     </main>
   );
 }

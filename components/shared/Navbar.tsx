@@ -6,8 +6,8 @@ import { useState } from 'react';
 
 const NAV=[
   {href:'/',label:'Kanban',icon:LayoutDashboard},
+  {href:'/cotizador',label:'Cotizador Pro',icon:Award},
   {href:'/calendario',label:'Agenda',icon:Calendar},
-  {href:'/pesquisa',label:'Pesquisa',icon:ClipboardCheck},
   {href:'/marketing',label:'Marketing',icon:Mail},
   {href:'/importar',label:'Importar',icon:Upload}
 ];
