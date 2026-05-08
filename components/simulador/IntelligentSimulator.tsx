@@ -217,7 +217,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
 
                       <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
                         <p className="text-sm font-medium text-blue-100/90 leading-relaxed italic">
-                          "{activePlan.insight}"
+                          &quot;{activePlan.insight}&quot;
                         </p>
                       </div>
 
