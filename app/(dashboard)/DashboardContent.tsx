@@ -4,20 +4,20 @@ import KanbanBoard from '@/components/kanban/KanbanBoard';
 import ListView from '@/components/leads/ListView';
 import LeadModal from '@/components/leads/LeadModal';
 import LeadForm from '@/components/leads/LeadForm';
+import IntelligentSimulator from '@/components/simulador/IntelligentSimulator';
 import type { Lead, Stage } from '@/types';
-import { Plus, Users, TrendingUp, DollarSign, LayoutGrid, List } from 'lucide-react';
-import { useLeads } from '@/hooks/useLeads';
-import { formatSueldo } from '@/lib/utils';
-
-// Iconos de lucide-react (corregido de lucide-center)
 import { 
+  Plus, 
   Users as UsersIcon, 
   TrendingUp as TrendingIcon, 
   DollarSign as DollarIcon, 
-  Award, 
   LayoutGrid as GridIcon, 
-  List as ListIcon 
+  List as ListIcon,
+  Award,
+  Sparkles
 } from 'lucide-react';
+import { useLeads } from '@/hooks/useLeads';
+import { formatSueldo } from '@/lib/utils';
 
 function KPI({icon:Icon,label,value,sub,color}:{icon:any;label:string;value:string|number;sub?:string;color:string}) {
   return <div className="bg-white p-5 flex items-center gap-4 rounded-xl shadow-sm border border-gray-100"><div className={`p-3 rounded-xl ${color}`}><Icon size={20} className="text-white"/></div><div><p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{label}</p><p className="text-xl font-bold tabular-nums">{value}</p>{sub&&<p className="text-xs text-gray-400 mt-0.5">{sub}</p>}</div></div>;
@@ -28,6 +28,7 @@ export default function DashboardContent() {
   const [sel,setSel]=useState<Lead|null>(null);
   const [addStage,setAddStage]=useState<Stage|null>(null);
   const [viewMode, setViewMode] = useState<'kanban'|'list'>('list');
+  const [showSim, setShowSim] = useState(false);
 
   const cierres=(leads || []).filter(l=>l && l.stage==='cierre').length;
   const pipeline=(leads || []).filter(l=>l && l.stage!=='nuevo'&&l.stage!=='no_interesado').length;
@@ -41,7 +42,7 @@ export default function DashboardContent() {
           <p className="text-sm text-gray-500 mt-0.5">Gestión de prospectos Isapre Colmena</p>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-200 p-1">
             <button 
               onClick={() => setViewMode('list')}
@@ -56,7 +57,19 @@ export default function DashboardContent() {
               <GridIcon size={16}/> Tablero
             </button>
           </div>
-          <button onClick={()=>setAddStage('nuevo')} className="btn-primary flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md"><Plus size={16}/>Nuevo prospecto</button>
+
+          <button 
+            onClick={() => setShowSim(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-100 hover:scale-105 transition-all"
+          >
+            <Sparkles size={16}/>
+            Simulador IA
+          </button>
+
+          <button onClick={()=>setAddStage('nuevo')} className="btn-primary flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm hover:shadow-md">
+            <Plus size={16}/>
+            Nuevo prospecto
+          </button>
         </div>
       </div>
 
@@ -75,6 +88,7 @@ export default function DashboardContent() {
 
       {sel&&<LeadModal lead={sel} onClose={()=>setSel(null)}/>}
       {addStage&&<LeadForm defaultStage={addStage} onClose={()=>setAddStage(null)}/>}
+      {showSim && <IntelligentSimulator onClose={() => setShowSim(false)} />}
     </main>
   );
 }
