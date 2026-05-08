@@ -14,7 +14,11 @@ import {
   Calculator,
   Stethoscope,
   Building2,
-  Table as TableIcon
+  Table as TableIcon,
+  HeartPulse,
+  Truck,
+  Plus,
+  BookmarkCheck
 } from 'lucide-react';
 import { PLANES, getFactor, GES_VALUE, REGIONES, Plan } from '@/lib/planData';
 
@@ -26,12 +30,26 @@ interface DetailedCost {
   totalUf: number;
 }
 
+const BENEFICIOS_ADICIONALES = [
+  { id: 'seguro-cesantia', label: 'Seguro de Cesantía (1 año)', icon: <ShieldCheck size={14} />, description: 'Cubre el pago del plan por hasta 4 meses en caso de desempleo.' },
+  { id: 'orientacion-medica', label: 'Telemedicina 24/7 Gratis', icon: <HeartPulse size={14} />, description: 'Consultas médicas ilimitadas por videollamada sin costo.' },
+  { id: 'asistencia-viaje', label: 'Asistencia en Viajes Nac/Int', icon: <Truck size={14} />, description: 'Cobertura de urgencias médicas fuera de tu región o país.' },
+  { id: 'dental-preventivo', label: 'Dental Preventivo Premium', icon: <Stethoscope size={14} />, description: 'Limpiezas y chequeos anuales gratuitos para todo el grupo.' }
+];
+
 export default function IntelligentSimulator({ onClose }: { onClose: () => void }) {
   const [titularEdad, setTitularEdad] = useState(30);
   const [cargas, setCargas] = useState<number[]>([]);
   const [region, setRegion] = useState('RM');
   const [ufValue, setUfValue] = useState(37800);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
+  const [selectedBenefits, setSelectedBenefits] = useState<string[]>([]);
+
+  const toggleBenefit = (id: string) => {
+    setSelectedBenefits(prev => 
+      prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]
+    );
+  };
 
   const addCarga = () => setCargas([...cargas, 25]);
   const removeCarga = (index: number) => setCargas(cargas.filter((_, i) => i !== index));
@@ -133,7 +151,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            {/* Panel Izquierdo: Configuración */}
+            {/* Panel Izquierdo: Configuración y Beneficios */}
             <div className="lg:col-span-3 space-y-6">
               <div className="bg-white dark:bg-gray-950 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-6">
                 <h3 className="text-sm font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
@@ -191,6 +209,32 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                   </div>
                 </div>
               </div>
+
+              {/* Sección de Beneficios Adicionales */}
+              <div className="bg-white dark:bg-gray-950 p-6 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 space-y-4">
+                <h3 className="text-sm font-black uppercase tracking-widest text-gray-400 flex items-center gap-2">
+                  <BookmarkCheck size={16} className="text-green-500" /> Beneficios Adicionales
+                </h3>
+                <p className="text-[10px] text-gray-400 font-bold leading-tight">Activa beneficios gratuitos por un año para incluirlos en la propuesta.</p>
+                
+                <div className="space-y-2">
+                  {BENEFICIOS_ADICIONALES.map(benefit => (
+                    <button
+                      key={benefit.id}
+                      onClick={() => toggleBenefit(benefit.id)}
+                      className={`w-full p-3 rounded-2xl border-2 transition-all text-left flex items-start gap-3 ${selectedBenefits.includes(benefit.id) ? 'border-green-500 bg-green-50/50' : 'border-gray-50 bg-gray-50/50'}`}
+                    >
+                      <div className={`p-2 rounded-lg ${selectedBenefits.includes(benefit.id) ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
+                        {benefit.icon}
+                      </div>
+                      <div>
+                        <p className={`text-[10px] font-black uppercase ${selectedBenefits.includes(benefit.id) ? 'text-green-700' : 'text-gray-500'}`}>{benefit.label}</p>
+                        <p className="text-[9px] text-gray-400 leading-tight mt-1">{benefit.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Panel Central: Análisis de la IA y Desglose */}
@@ -199,7 +243,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
               {/* Card de IA Mejorada */}
               {activePlan && (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                  <div className="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-[3rem] p-8 text-white shadow-xl shadow-blue-900/20 relative overflow-hidden group">
+                  <div className="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-[3rem] p-8 text-white shadow-xl shadow-blue-900/20 relative overflow-hidden group transition-all duration-500">
                     <Sparkles className="absolute top-[-20px] right-[-20px] text-white/10" size={180} />
                     <div className="relative z-10 space-y-6">
                       <div className="flex items-center gap-3 px-4 py-1.5 bg-white/10 border border-white/20 rounded-full w-fit">
@@ -244,7 +288,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                     
                     <div className="space-y-3">
                       {/* Fila Titular */}
-                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl">
+                      <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-transparent hover:border-blue-100 transition-all">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-black text-xs">T</div>
                           <div>
@@ -257,12 +301,16 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
 
                       {/* Filas Cargas */}
                       {activePlan.cargasDetalle.map((c, i) => (
-                        <div key={i} className="flex items-center justify-between p-4 bg-indigo-50/30 dark:bg-indigo-900/10 rounded-2xl">
+                        <div key={i} className="flex items-center justify-between p-4 bg-indigo-50/30 dark:bg-indigo-900/10 rounded-2xl border border-transparent hover:border-indigo-100 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xs">{i+1}</div>
                             <div>
                               <p className="text-xs font-black">{c.label} ({c.age} años)</p>
-                              <p className="text-[10px] text-gray-400 font-bold">Factor {c.factor} × PB {c.pb}</p>
+                              {c.age < 2 ? (
+                                <p className="text-[10px] text-green-600 font-black uppercase">Exento (Menor 2 años)</p>
+                              ) : (
+                                <p className="text-[10px] text-gray-400 font-bold">Factor {c.factor} × PB {c.pb}</p>
+                              )}
                             </div>
                           </div>
                           <p className="font-black text-sm">{c.totalUf.toFixed(3)} UF</p>
@@ -280,6 +328,23 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                         </div>
                         <p className="font-black text-sm">{activePlan.gesTotal.toFixed(3)} UF</p>
                       </div>
+
+                      {/* Resumen de Beneficios Seleccionados */}
+                      {selectedBenefits.length > 0 && (
+                        <div className="p-4 bg-green-50/50 dark:bg-green-900/10 rounded-2xl border border-green-100/50">
+                          <p className="text-[10px] font-black uppercase text-green-700 mb-2">Beneficios Activos (1 año gratis):</p>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedBenefits.map(bId => {
+                              const b = BENEFICIOS_ADICIONALES.find(x => x.id === bId);
+                              return (
+                                <span key={bId} className="px-2 py-1 bg-white border border-green-200 rounded-lg text-[9px] font-bold text-green-600 flex items-center gap-1">
+                                  {b?.icon} {b?.label}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
 
                       <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-between items-center px-4">
                         <p className="text-sm font-black text-gray-900 dark:text-white uppercase">Suma Total</p>
@@ -314,17 +379,17 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                       </tr>
                     </thead>
                     <tbody>
-                      {results.slice(0, 20).map((plan, idx) => (
+                      {results.slice(0, 25).map((plan, idx) => (
                         <tr 
                           key={idx} 
                           onClick={() => setSelectedPlanId(plan.nombre)}
-                          className={`group hover:bg-blue-50/50 dark:hover:bg-blue-900/5 transition-colors cursor-pointer ${selectedPlanId === plan.nombre ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}
+                          className={`group hover:bg-blue-50/50 dark:hover:bg-blue-900/5 transition-colors cursor-pointer ${activePlan?.nombre === plan.nombre ? 'bg-blue-50 dark:bg-blue-900/10' : ''}`}
                         >
                           <td className="p-4 border-b border-gray-50 dark:border-gray-800">
                             <div className="flex items-center gap-3">
                               {idx === 0 && <Sparkles size={14} className="text-yellow-500" />}
                               <div>
-                                <p className="text-xs font-black text-gray-900 dark:text-white uppercase">{plan.nombre}</p>
+                                <p className={`text-xs font-black uppercase ${activePlan?.nombre === plan.nombre ? 'text-blue-600' : 'text-gray-900 dark:text-white'}`}>{plan.nombre}</p>
                                 <p className="text-[9px] font-bold text-gray-400">Tipo: {plan.tipo}</p>
                               </div>
                             </div>
@@ -343,9 +408,9 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                             <p className="text-[10px] font-bold text-gray-600 dark:text-gray-400 line-clamp-1">{plan.consultaPref}</p>
                           </td>
                           <td className="p-4 border-b border-gray-50 dark:border-gray-800">
-                            <button className="p-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-400 group-hover:text-blue-600 group-hover:border-blue-200 transition-all">
+                            <div className={`p-2 rounded-xl border transition-all ${activePlan?.nombre === plan.nombre ? 'bg-blue-600 text-white border-blue-600' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-400'}`}>
                               <ChevronRight size={16} />
-                            </button>
+                            </div>
                           </td>
                         </tr>
                       ))}
