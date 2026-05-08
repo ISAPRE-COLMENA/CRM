@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 const NAV=[
   {href:'/',label:'Kanban',icon:LayoutDashboard},
-  {href:'/simulador',label:'Simulador',icon:Award},
   {href:'/calendario',label:'Agenda',icon:Calendar},
   {href:'/pesquisa',label:'Pesquisa',icon:ClipboardCheck},
   {href:'/marketing',label:'Marketing',icon:Mail},
