@@ -5,7 +5,7 @@ import ListView from '@/components/leads/ListView';
 import LeadModal from '@/components/leads/LeadModal';
 import LeadForm from '@/components/leads/LeadForm';
 import type { Lead, Stage } from '@/types';
-import { Plus, Users, TrendingUp, DollarSign, LayoutGrid, List } from 'lucide-center';
+import { Plus, Users, TrendingUp, DollarSign, LayoutGrid, List } from 'lucide-react';
 import { useLeads } from '@/hooks/useLeads';
 import { formatSueldo } from '@/lib/utils';
 
