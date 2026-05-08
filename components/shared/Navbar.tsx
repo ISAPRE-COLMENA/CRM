@@ -1,13 +1,14 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Calendar, Upload, LogOut, ShieldCheck, Menu, X, ClipboardCheck } from 'lucide-react';
+import { LayoutDashboard, Calendar, Upload, LogOut, ShieldCheck, Menu, X, ClipboardCheck, Mail } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV=[
   {href:'/',label:'Kanban',icon:LayoutDashboard},
   {href:'/calendario',label:'Agenda',icon:Calendar},
   {href:'/pesquisa',label:'Pesquisa',icon:ClipboardCheck},
+  {href:'/marketing',label:'Marketing',icon:Mail},
   {href:'/importar',label:'Importar',icon:Upload}
 ];
 

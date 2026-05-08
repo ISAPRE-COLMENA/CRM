@@ -12,8 +12,10 @@ export interface Interaccion {
   tipo:'llamada'|'videollamada'|'visita'|'email'|'whatsapp'|'nota';
   notas?:string; duracion_min?:number; sala_jitsi?:string; created_at:string;
 }
+export type EventType = 'reunion'|'visita_terreno'|'videollamada'|'seguimiento'|'otro';
 export interface Evento {
   id:string; lead_id?:string; agente_id?:string; titulo:string;
-  tipo:'reunion'|'visita_terreno'|'videollamada'|'seguimiento'|'otro';
-  inicio:string; fin:string; sala_jitsi?:string; created_at:string;
+  tipo: EventType;
+  inicio:string; fin:string; sala_jitsi?:string; ubicacion?:string; created_at:string;
+  lead_nombre?:string;
 }

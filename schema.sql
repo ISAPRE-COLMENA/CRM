@@ -81,6 +81,7 @@ CREATE TABLE IF NOT EXISTS eventos (
   inicio     TIMESTAMPTZ NOT NULL,
   fin        TIMESTAMPTZ NOT NULL,
   sala_jitsi TEXT,
+  ubicacion  TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_ev_agente ON eventos(agente_id);
@@ -101,13 +102,14 @@ BEGIN
 END; $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ── ROW LEVEL SECURITY ──────────────────────────────────────
-ALTER TABLE leads         ENABLE ROW LEVEL SECURITY;
-ALTER TABLE interacciones ENABLE ROW LEVEL SECURITY;
-ALTER TABLE eventos       ENABLE ROW LEVEL SECURITY;
+-- DESACTIVADO TEMPORALMENTE PARA DESARROLLO SIN LOGIN
+-- ALTER TABLE leads         ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE interacciones ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE eventos       ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "agentes_leads"
-  ON leads FOR ALL USING (agente_id = auth.uid());
-CREATE POLICY "agentes_interacciones"
-  ON interacciones FOR ALL USING (agente_id = auth.uid());
-CREATE POLICY "agentes_eventos"
-  ON eventos FOR ALL USING (agente_id = auth.uid());
+-- CREATE POLICY "agentes_leads"
+--   ON leads FOR ALL USING (agente_id = auth.uid());
+-- CREATE POLICY "agentes_interacciones"
+--   ON interacciones FOR ALL USING (agente_id = auth.uid());
+-- CREATE POLICY "agentes_eventos"
+--   ON eventos FOR ALL USING (agente_id = auth.uid());

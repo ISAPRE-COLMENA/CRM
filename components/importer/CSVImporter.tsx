@@ -15,7 +15,48 @@ export default function CSVImporter({onComplete}:{onComplete?:(s:{inserted:numbe
   const [drag,setDrag]=useState(false);
   const inputRef=useRef<HTMLInputElement>(null);
   const handleFile=useCallback((f:File)=>{setFile(f);const r=new FileReader();r.onload=e=>{const{headers,rows}=parseCSV(e.target?.result as string);const m:Record<string,string>={};headers.forEach(h=>{const field=detectField(h);if(field)m[field]=h;});setParsed({headers,rows});setMapping(m);setStep('mapping');};r.readAsText(f,'UTF-8');},[]);
-  const handleImport=async()=>{if(!parsed)return;setStep('importing');const stats={inserted:0,duplicates:0,errors:0,errorRows:[] as string[]};const toInsert=parsed.rows.filter(row=>mapping.rut&&row[mapping.rut]?.trim()).map(row=>{const lead:Record<string,unknown>={};for(const[field,col]of Object.entries(mapping)){if(col&&row[col]!==undefined){let v:unknown=row[col].trim();if(field==='rut')v=normalizeRUT(v as string);if(field==='sueldo_imponible')v=parseFloat((v as string).replace(/[^\d.]/g,''))||null;lead[field]=v||null;}}lead.stage='nuevo';return lead;});for(let i=0;i<toInsert.length;i+=50){const batch=toInsert.slice(i,i+50);const{data,error}=await supabase.from('leads').upsert(batch,{onConflict:'rut',ignoreDuplicates:true}).select('id');if(error){stats.errors+=batch.length;stats.errorRows.push(error.message);}else{stats.inserted+=data?.length||0;stats.duplicates+=batch.length-(data?.length||0);}}setResults(stats);setStep('done');onComplete?.(stats);};
+  const handleImport=async()=>{
+    if(!parsed)return;
+    setStep('importing');
+    const stats={inserted:0,duplicates:0,errors:0,errorRows:[] as string[]};
+    const toInsert=parsed.rows.filter(row=>mapping.rut&&row[mapping.rut]?.trim()).map(row=>{
+      const lead:Record<string,unknown>={};
+      for(const[field,col]of Object.entries(mapping)){
+        if(col&&row[col]!==undefined){
+          let v:unknown=row[col].trim();
+          if(field==='rut')v=normalizeRUT(v as string);
+          if(field==='sueldo_imponible')v=parseFloat((v as string).replace(/[^\d.]/g,''))||null;
+          lead[field]=v||null;
+        }
+      }
+      lead.stage='nuevo';
+      return lead;
+    });
+    for(let i=0;i<toInsert.length;i+=50){
+      const batch=toInsert.slice(i,i+50);
+      try {
+        const res = await fetch('/api/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ batch })
+        });
+        const json = await res.json();
+        if(!res.ok || json.error){
+          stats.errors+=batch.length;
+          stats.errorRows.push(json.error || 'Error desconocido');
+        }else{
+          stats.inserted+=json.data?.length||0;
+          stats.duplicates+=batch.length-(json.data?.length||0);
+        }
+      } catch (err: any) {
+        stats.errors+=batch.length;
+        stats.errorRows.push(err.message);
+      }
+    }
+    setResults(stats);
+    setStep('done');
+    onComplete?.(stats);
+  };
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       {step==='upload'&&(<div onDrop={e=>{e.preventDefault();setDrag(false);const f=e.dataTransfer.files[0];if(f?.name.match(/\.(csv|txt)$/i))handleFile(f);}} onDragOver={e=>{e.preventDefault();setDrag(true);}} onDragLeave={()=>setDrag(false)} onClick={()=>inputRef.current?.click()} className={`border-2 border-dashed rounded-2xl p-14 text-center cursor-pointer transition-all ${drag?'border-blue-400 bg-blue-50':'border-gray-200 hover:border-gray-300'}`}><input ref={inputRef} type="file" accept=".csv,.txt" className="hidden" onChange={e=>{if(e.target.files?.[0])handleFile(e.target.files[0]);}}/><div className="flex flex-col items-center gap-3"><div className="p-4 rounded-2xl bg-gray-100"><FileSpreadsheet size={28} className="text-gray-500"/></div><div><p className="font-semibold text-gray-800">Arrastra tu CSV aquí</p><p className="text-sm text-gray-500 mt-1">o haz clic para seleccionarlo</p></div></div></div>)}

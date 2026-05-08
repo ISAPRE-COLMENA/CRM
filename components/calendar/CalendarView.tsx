@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
-import { useEvents, EventType } from '@/hooks/useEvents';
+import { useEvents } from '@/hooks/useEvents';
+import { EventType } from '@/types';
 import { Calendar as CalendarIcon, Clock, MapPin, Video, Phone, Plus, ChevronRight, MoreHorizontal } from 'lucide-react';
 import { format } from 'date-fns';
 import AddEventModal from './AddEventModal';
@@ -67,23 +68,41 @@ export default function CalendarView() {
               eventos.map(event => {
                 const Icon = ICON_MAP[event.tipo] || MoreHorizontal;
                 return (
-                  <div key={event.id} className="group p-3 rounded-xl border border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 hover:border-blue-200 dark:hover:border-blue-900 hover:bg-white dark:hover:bg-gray-800 transition-all cursor-pointer">
+                  <div key={event.id} className="group p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/30 hover:border-blue-200 dark:hover:border-blue-900 hover:bg-white dark:hover:bg-gray-800 transition-all shadow-sm">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 rounded-lg bg-white dark:bg-gray-700 shadow-sm">
-                        <Icon size={14} style={{ color: COLORS[event.tipo] }}/>
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-gray-700 shadow-sm border border-gray-100 dark:border-gray-600">
+                        <Icon size={16} style={{ color: COLORS[event.tipo] }}/>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-bold text-gray-900 dark:text-gray-100 truncate">{event.titulo}</p>
-                        <div className="flex items-center gap-1.5 mt-1 text-[10px] text-gray-500 font-medium">
-                          <Clock size={10}/>
-                          {format(new Date(event.inicio), 'HH:mm')} - {format(new Date(event.fin), 'HH:mm')}
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-bold text-gray-900 dark:text-gray-100 truncate">{event.titulo}</p>
+                          <span className="text-[10px] font-bold text-gray-400">{format(new Date(event.inicio), 'HH:mm')}</span>
                         </div>
+                        
                         {event.lead_nombre && (
-                          <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-blue-600 font-semibold uppercase tracking-wider">
-                            <ChevronRight size={10}/>
-                            {event.lead_nombre}
-                          </div>
+                          <p className="text-[10px] text-blue-600 font-bold uppercase mt-1 tracking-tight">{event.lead_nombre}</p>
                         )}
+
+                        {/* Detalles condicionales */}
+                        <div className="mt-3 space-y-2">
+                          {event.tipo === 'videollamada' && event.sala_jitsi && (
+                            <a 
+                              href={event.sala_jitsi} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="flex items-center justify-center gap-2 w-full py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold transition-colors"
+                            >
+                              <Video size={12}/> Unirse a la llamada
+                            </a>
+                          )}
+                          
+                          {event.tipo === 'visita_terreno' && event.ubicacion && (
+                            <div className="flex items-center gap-1.5 text-[10px] text-gray-500 bg-white dark:bg-gray-800 p-1.5 rounded-lg border border-gray-100 dark:border-gray-700">
+                              <MapPin size={12} className="text-red-500 shrink-0"/>
+                              <span className="truncate">{event.ubicacion}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
