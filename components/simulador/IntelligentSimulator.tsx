@@ -23,7 +23,7 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
     const gesTotal = totalIntegrantes * GES_VALUE;
 
     return PLANES
-      .filter(p => p.region === region || p.region === 'NACIONAL')
+      .filter(p => p.region === region)
       .map(plan => {
         const pb = totalIntegrantes > 1 ? plan.pbGrupal : plan.pbIndividual;
         const costoTitular = factorTitular * pb;
