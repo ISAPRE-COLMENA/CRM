@@ -4,6 +4,7 @@ import KanbanBoard from '@/components/kanban/KanbanBoard';
 import ListView from '@/components/leads/ListView';
 import LeadModal from '@/components/leads/LeadModal';
 import LeadForm from '@/components/leads/LeadForm';
+import IntelligentSimulator from '@/components/simulador/IntelligentSimulator';
 import type { Lead, Stage } from '@/types';
 import { Plus, Users, TrendingUp, DollarSign, Award, LayoutGrid, List } from 'lucide-react';
 import { useLeads } from '@/hooks/useLeads';
@@ -18,6 +19,7 @@ export default function DashboardContent() {
   const [sel,setSel]=useState<Lead|null>(null);
   const [addStage,setAddStage]=useState<Stage|null>(null);
   const [viewMode, setViewMode] = useState<'kanban'|'list'>('list');
+  const [showSim, setShowSim] = useState(false);
 
   const cierres=(leads || []).filter(l=>l && l.stage==='cierre').length;
   const pipeline=(leads || []).filter(l=>l && l.stage!=='nuevo'&&l.stage!=='no_interesado').length;
@@ -32,6 +34,13 @@ export default function DashboardContent() {
         </div>
         
         <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setShowSim(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all"
+          >
+            <Award size={16}/> Simulador IA
+          </button>
+
           <div className="flex items-center bg-white rounded-xl shadow-sm border border-gray-200 p-1">
             <button 
               onClick={() => setViewMode('list')}
@@ -65,6 +74,7 @@ export default function DashboardContent() {
 
       {sel&&<LeadModal lead={sel} onClose={()=>setSel(null)}/>}
       {addStage&&<LeadForm defaultStage={addStage} onClose={()=>setAddStage(null)}/>}
+      {showSim&&<IntelligentSimulator onClose={()=>setShowSim(false)}/>}
     </main>
   );
 }
