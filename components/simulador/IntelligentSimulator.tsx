@@ -22,7 +22,7 @@ import {
   Info,
   ArrowRight
 } from 'lucide-react';
-import { PLANES, getFactor, GES_VALUE, REGIONES } from '@/lib/planData';
+import { PLANES, getFactor, GES_VALUE, REGIONES, translateDescription } from '@/lib/planData';
 
 interface FamilyMember {
   id: string;
@@ -32,9 +32,11 @@ interface FamilyMember {
 }
 
 const BENEFICIOS_PRO = [
-  { id: 'cesantia', label: 'Seguro Cesantía', icon: <ShieldCheck size={14} /> },
-  { id: 'telemed', label: 'Telemedicina 24/7', icon: <HeartPulse size={14} /> },
-  { id: 'viaje', label: 'Asistencia Viaje', icon: <Truck size={14} /> }
+  { id: 'telemed', label: 'Doctor Online Pro', priceUf: 0.19, detail: 'Consultas médicas ilimitadas copago $0', icon: <HeartPulse size={14} /> },
+  { id: 'farma', label: 'Pharma Max', priceUf: 0.17, detail: '90% bonificación en medicamentos', icon: <ShieldCheck size={14} /> },
+  { id: 'dental', label: 'Dental Plus', priceUf: 0.19, detail: '80% dcto en RedSalud / 70% Uno Salud', icon: <Plus size={14} /> },
+  { id: 'urgencia', label: 'Urgencia Ambulatoria', priceUf: 0.17, detail: '80% financiamiento copagos urgencia', icon: <Zap size={14} /> },
+  { id: 'catastrofico', label: 'Catastrófico LE', priceUf: 0.14, detail: '100% reembolso enfermedades alto costo', icon: <BookmarkCheck size={14} /> },
 ];
 
 export default function IntelligentSimulator({ onClose }: { onClose: () => void }) {
@@ -92,6 +94,14 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
 
         const gesTotal = members.length * GES_VALUE;
         totalUf += gesTotal;
+
+        // Add Selected Benefits (calculated per member)
+        const benefitsUfTotal = selectedBenefits.reduce((acc, bId) => {
+          const benefit = BENEFICIOS_PRO.find(b => b.id === bId);
+          return acc + (benefit?.priceUf || 0) * members.length;
+        }, 0);
+        
+        totalUf += benefitsUfTotal;
         const totalClp = totalUf * ufValue;
 
         return {
@@ -99,12 +109,13 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
           totalUf,
           totalClp,
           gesTotal,
+          benefitsUfTotal,
           membersDetail,
           pb
         };
       })
       .sort((a, b) => a.totalUf - b.totalUf);
-  }, [members, region, ufValue]);
+  }, [members, region, ufValue, selectedBenefits]);
 
   const activePlan = selectedPlanId ? results.find(r => r.nombre === selectedPlanId) : results[0];
 
@@ -167,6 +178,31 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-800">
+               <h3 className="text-sm font-black text-gray-500 uppercase tracking-widest">Productos Adicionales</h3>
+               <div className="grid grid-cols-1 gap-2">
+                  {BENEFICIOS_PRO.map(b => (
+                    <button 
+                      key={b.id} 
+                      onClick={() => {
+                        setSelectedBenefits(prev => 
+                          prev.includes(b.id) ? prev.filter(x => x !== b.id) : [...prev, b.id]
+                        );
+                      }}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all border-2 ${selectedBenefits.includes(b.id) ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-transparent bg-white text-gray-400 shadow-sm hover:border-gray-100'}`}
+                    >
+                      <div className={`p-2 rounded-lg ${selectedBenefits.includes(b.id) ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                        {b.icon}
+                      </div>
+                      <div className="text-left">
+                        <p className="text-[10px] font-black leading-tight">{b.label}</p>
+                        <p className="text-[9px] font-bold opacity-60 leading-tight">{b.priceUf} UF/pers.</p>
+                      </div>
+                    </button>
+                  ))}
+               </div>
             </div>
 
             <div className="space-y-4 pt-6 border-t border-gray-200 dark:border-gray-800">
@@ -268,20 +304,19 @@ export default function IntelligentSimulator({ onClose }: { onClose: () => void 
                          </div>
                          
                          <div>
-                            <h2 className="text-6xl font-black leading-tight tracking-tighter uppercase">{activePlan.nombre}</h2>
-                            <p className="text-xl font-bold text-blue-100 opacity-80 mt-2">{activePlan.tipo} • Isapre Colmena</p>
+                            <h2 className="text-4xl font-black leading-none tracking-tighter uppercase">{activePlan.nombre}</h2>
                          </div>
 
                          <div className="grid grid-cols-3 gap-4">
-                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md min-h-[100px]">
                                <p className="text-[10px] font-black uppercase text-blue-200 mb-1">Ambulatoria</p>
-                               <p className="text-xl font-black">90% <span className="text-xs font-bold opacity-60">Pref.</span></p>
+                               <p className="text-[10px] leading-tight font-bold text-white/90">{translateDescription(activePlan.dcPref)}</p>
                             </div>
-                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md min-h-[100px]">
                                <p className="text-[10px] font-black uppercase text-blue-200 mb-1">Hospitalaria</p>
-                               <p className="text-xl font-black">100% <span className="text-xs font-bold opacity-60">Tope</span></p>
+                               <p className="text-[10px] leading-tight font-bold text-white/90">{translateDescription(activePlan.coberturaHosp)}</p>
                             </div>
-                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md">
+                            <div className="bg-white/10 p-4 rounded-2xl border border-white/10 backdrop-blur-md min-h-[100px]">
                                <p className="text-[10px] font-black uppercase text-blue-200 mb-1">Copago Fijo</p>
                                <p className="text-xl font-black">UF 0,3</p>
                             </div>

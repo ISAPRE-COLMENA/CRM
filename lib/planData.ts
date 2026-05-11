@@ -30,3 +30,37 @@ export const REGIONES = [
   { id: 'RM', label: 'Región Metropolitana (Santiago)' },
   { id: 'REGIONES', label: 'Regiones (Norte / Sur)' }
 ];
+
+const CLINIC_MAP: Record<string, string> = {
+  'G41': 'Hosp. Profesor / Cl. Cordillera',
+  'G42': 'Cl. Dávila / Bupa Santiago',
+  'G43': 'RedSalud / Hosp. Clínico U. de Chile',
+  'G44': 'Cl. Indisa / Santa María',
+  'G45': 'Cl. Alemana / Las Condes',
+  'G46': 'Red Vidaintegra',
+  'ST': 'Sin Tope / Libre Elección'
+};
+
+export const translateDescription = (text: string): string => {
+  if (!text) return '';
+  if (text === 'ST') return CLINIC_MAP['ST'];
+  
+  // Si el texto contiene códigos de grupo como G41, G42...
+  if (text.includes('G4')) {
+    let parts = text.split(/\s+/).filter(p => p.includes('G4'));
+    let result = parts.map(p => {
+      const codeMatch = p.match(/G4\d/);
+      const percentMatch = p.match(/(\d+)%/);
+      if (codeMatch) {
+        const code = codeMatch[0];
+        const percent = percentMatch ? percentMatch[1] : '0';
+        return `${percent}% ${CLINIC_MAP[code] || code}`;
+      }
+      return p;
+    }).join(' • ');
+    
+    return result || text;
+  }
+  
+  return text.trim();
+};

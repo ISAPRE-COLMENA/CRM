@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Send, Users, FileText, Image as ImageIcon, Eye, Loader2, CheckCircle2 } from 'lucide-react';
 import { useLeads } from '@/hooks/useLeads';
 
+import { sendCampaignAction } from '@/lib/actions/marketing';
+
 export default function EmailCampaignBuilder() {
   const { leads } = useLeads();
   const [subject, setSubject] = useState('');
@@ -18,11 +20,28 @@ export default function EmailCampaignBuilder() {
   const handleSend = async () => {
     if (!subject || !content || filteredLeads.length === 0) return;
     setStatus('sending');
-    // Simulated delay for now
-    setTimeout(() => {
-      setStatus('sent');
-      setTimeout(() => setStatus('idle'), 3000);
-    }, 2000);
+    
+    try {
+      const result = await sendCampaignAction({
+        subject,
+        content,
+        leads: filteredLeads.map(l => ({ 
+          email: l.email || '', 
+          name: `${l.nombre} ${l.apellido}`.trim() 
+        }))
+      });
+
+      if (result.success) {
+        setStatus('sent');
+        setTimeout(() => setStatus('idle'), 3000);
+      } else {
+        alert('Error al enviar: ' + result.error);
+        setStatus('idle');
+      }
+    } catch (error) {
+      alert('Error inesperado al enviar la campaña');
+      setStatus('idle');
+    }
   };
 
   return (
